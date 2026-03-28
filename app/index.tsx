@@ -2,11 +2,12 @@ import { Feed } from "@/src/components/Feed";
 import { NEWS_FEEDS } from "@/src/constants/rssUrls";
 import { useFetchFeed } from "@/src/hooks/useFetchFeed";
 import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const { data, loading, error, refetch } = useFetchFeed(NEWS_FEEDS.latest.url);
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Feed
         loading={loading}
         data={data}
@@ -14,12 +15,12 @@ export default function HomeScreen() {
         error={error}
         ListHeaderComponent={() => (
           <View style={styles.header}>
-            <Text style={styles.eyebrow}>{data?.description}</Text>
             <Text style={styles.title}>{data?.title || "Seneste nyt"}</Text>
+            <Text style={styles.eyebrow}>Kort nyt</Text>
           </View>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -28,8 +29,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F4F7FA",
     paddingHorizontal: 20,
-    paddingTop: 72,
-    paddingBottom: 32,
   },
   header: {
     paddingBottom: 16,
@@ -39,7 +38,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 1.1,
-    color: "#005A8D",
+    color: "#d60007",
     marginBottom: 10,
   },
   title: {

@@ -1,10 +1,10 @@
 import {
-    Image,
-    Linking,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Image,
+  Linking,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 //TODO: maybe move to ts types file
@@ -20,6 +20,7 @@ type FeedCardProps = {
   item: FeedCardItem;
   onPress?: (item: FeedCardItem) => void;
   loading?: boolean;
+  //TODO: add variation prop to show different styles of card.(tall image, breaking news etc. )
 };
 
 export function FeedCard({ item, onPress, loading }: FeedCardProps) {
@@ -27,7 +28,6 @@ export function FeedCard({ item, onPress, loading }: FeedCardProps) {
     return <FeedCardSkeleton />;
   }
 
-  const hasImage = !!item?.imageUrl;
   const formatedDate = formatPublishedDate(item.pubDate);
 
   const handlePress = () => {
@@ -43,16 +43,12 @@ export function FeedCard({ item, onPress, loading }: FeedCardProps) {
 
   return (
     <Pressable onPress={handlePress} style={[styles.card]}>
-      {hasImage ? (
+      {item.imageUrl && (
         <Image
           source={{ uri: item.imageUrl as string }}
           style={styles.image}
           resizeMode="cover"
         />
-      ) : (
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.imagePlaceholderText}>No image</Text>
-        </View>
       )}
 
       <View style={styles.content}>
@@ -95,9 +91,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
     shadowRadius: 18,
     elevation: 3,
   },

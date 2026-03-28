@@ -1,13 +1,36 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-
+import { Feed } from "@/src/components/Feed";
+import { FeedFilter } from "@/src/components/FeedSelector";
+import { NEWS_FEEDS, NewsFeedKey } from "@/src/constants/rssUrls";
+import { useFetchFeed } from "@/src/hooks/useFetchFeed";
+import { useMemo, useState } from "react";
+import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function ExploreScreen() {
+  // state for the selected feed
+  const [selectedFeed, setSelectedFeed] = useState<NewsFeedKey>("latest");
+  // format the feeds for the filter component
+  const filterItems = useMemo(() => {
+    return Object.entries(NEWS_FEEDS).map(([key, feed]) => ({
+      key,
+      label: feed.label,
+    }));
+  }, []);
+
+  // get the selected feed url
+  const selectedUrl = NEWS_FEEDS[selectedFeed].url;
+  // fetch the feed data
+  const { data, loading, error, refetch } = useFetchFeed(selectedUrl);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Explore</Text>
-      <Text style={styles.subtitle}>Discover feeds and topics here.</Text>
-      <StatusBar style="dark" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <FeedFilter
+        items={filterItems}
+        selectedKey={selectedFeed}
+        onSelect={(key) => setSelectedFeed(key as NewsFeedKey)}
+        style={styles.filter}
+      />
+      <Feed loading={loading} data={data} refetch={refetch} error={error} />
+    </SafeAreaView>
   );
 }
 
@@ -15,7 +38,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
     justifyContent: "center",
     padding: 24,
   },
@@ -30,5 +52,8 @@ const styles = StyleSheet.create({
     opacity: 0.85,
     textAlign: "center",
     color: "#11181C",
+  },
+  filter: {
+    marginBottom: 16,
   },
 });
