@@ -1,11 +1,17 @@
+import { NEWS_FEEDS } from "@/src/constants/rssUrls";
+import { useFetchFeed } from "@/src/hooks/useFetchFeed";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
+  const { data, loading, error } = useFetchFeed(NEWS_FEEDS.latest.url);
+  console.log("data", data);
+  console.log("loading", loading);
+  console.log("error", error);
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-      <Text style={styles.subtitle}>Welcome to your feed.</Text>
+      <Text style={styles.title}>{data?.title}</Text>
+      <Text style={styles.subtitle}>{data?.description}</Text>
       <StatusBar style="dark" />
     </View>
   );
