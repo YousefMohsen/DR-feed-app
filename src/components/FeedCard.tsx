@@ -1,11 +1,4 @@
-import {
-  Image,
-  Linking,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 //TODO: maybe move to ts types file
 export type FeedCardItem = {
@@ -34,10 +27,6 @@ export function FeedCard({ item, onPress, loading }: FeedCardProps) {
     if (onPress) {
       onPress(item);
       return;
-    }
-
-    if (item.link) {
-      void Linking.openURL(item.link);
     }
   };
 

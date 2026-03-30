@@ -1,4 +1,5 @@
 import { FeedCard, type FeedCardItem } from "@/src/components/FeedCard";
+import { useRouter } from "expo-router";
 import { FlatList, type FlatListProps, StyleSheet, View } from "react-native";
 
 type FeedData = {
@@ -22,6 +23,7 @@ export function Feed({
   error,
   ...flatListProps
 }: FeedProps) {
+  const router = useRouter();
   // if (error) {
   //   return <Text style={styles.info}>noget gik galt.</Text>;
   // }
@@ -33,7 +35,21 @@ export function Feed({
   return (
     <FlatList
       keyExtractor={(item) => item.guid}
-      renderItem={({ item }) => <FeedCard item={item} loading={loading} />}
+      renderItem={({ item }) => (
+        <FeedCard
+          item={item}
+          loading={loading}
+          onPress={() =>
+            router.push({
+              pathname: "/article/[id]",
+              params: {
+                guid: item.guid,
+                item: JSON.stringify(item), //TODO: only send image url and title. Can have performance effect if object is too large.
+              },
+            })
+          }
+        />
+      )}
       ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       data={data?.items}
       refreshing={loading}
