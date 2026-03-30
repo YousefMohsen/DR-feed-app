@@ -119,7 +119,7 @@ function formatPublishedDate(pubDate: string) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: "#F4F7FA",
   },
   container: {
     paddingHorizontal: 16,

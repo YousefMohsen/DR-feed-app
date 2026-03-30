@@ -37,7 +37,7 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F4F7FA",
     justifyContent: "center",
     padding: 24,
   },
