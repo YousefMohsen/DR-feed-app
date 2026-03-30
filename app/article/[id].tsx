@@ -71,7 +71,7 @@ export default function ArticleScreen() {
               ]}
               onPress={() => router.back()}
             >
-              <Ionicons name="chevron-back" size={26} color="#FFFFFF" />
+              <Ionicons name="close" size={26} color="#FFFFFF" />
             </Pressable>
           </View>
 
