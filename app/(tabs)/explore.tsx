@@ -7,7 +7,7 @@ import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function ExploreScreen() {
   // state for the selected feed
-  const [selectedFeed, setSelectedFeed] = useState<NewsFeedKey>("latest");
+  const [selectedFeed, setSelectedFeed] = useState<NewsFeedKey>("indland");
   // format the feeds for the filter component
   const filterItems = useMemo(() => {
     return Object.entries(NEWS_FEEDS)
@@ -40,8 +40,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F4F7FA",
-    justifyContent: "center",
-    padding: 24,
+    padding: 20,
   },
   title: {
     fontSize: 28,

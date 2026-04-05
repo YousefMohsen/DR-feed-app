@@ -28,17 +28,16 @@ export type FeedFilterProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-
 /**
- * Animated tag component for the feed filter
+ * Tag component for the feed filter
  */
-function AnimatedTag({
+function Tag({
   label,
   isSelected,
   onPress,
 }: {
   label: FilterItem["label"];
-  isSelected: boolean; 
+  isSelected: boolean;
   onPress: () => void;
 }) {
   // keeps track of whether the tag is selected (0 = no, 1 = yes)
@@ -60,11 +59,11 @@ function AnimatedTag({
 
   // styles for the tag box (size, position, colors, shadow)
   const containerStyle = useAnimatedStyle(() => {
-    const scale = interpolate(selected.value, [0, 1], [1, 1.08]) -
-      pressed.value * 0.04;
+    const scale =
+      interpolate(selected.value, [0, 1], [1, 1.08]) - pressed.value * 0.04;
 
-    const translateY = interpolate(selected.value, [0, 1], [0, -3]) +
-      pressed.value * 1.5;
+    const translateY =
+      interpolate(selected.value, [0, 1], [0, -3]) + pressed.value * 1.5;
 
     return {
       transform: [{ scale }, { translateY }],
@@ -134,7 +133,7 @@ export function FeedFilter({
       contentContainerStyle={[styles.container, style]}
     >
       {items.map((item) => (
-        <AnimatedTag
+        <Tag
           key={item.key}
           label={item.label}
           isSelected={item.key === selectedKey}

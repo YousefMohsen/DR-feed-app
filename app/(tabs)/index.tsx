@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
-    paddingBottom: 16,
+    marginBottom: 12,
   },
   eyebrow: {
     fontSize: 13,
