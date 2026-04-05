@@ -1,8 +1,14 @@
 import { theme } from "@/src/constants/theme";
+import {
+  drArticleCanonicalUrl,
+  useArticleByUrn,
+  type DrArticle,
+} from "@/src/hooks/useArticleByUrn";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -21,47 +27,93 @@ type ArticleItem = {
   imageUrl?: string;
 };
 
-const DUMMY_TEXT = `Dans på busserne, unge mennesker i lygtepælene og 4-0. Ja, vi husker nok alle sommeren 2021 med det danske fodboldlandshold.
+function formatPublishedDate(pubDate: string) {
+  return new Intl.DateTimeFormat("da-DK", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(pubDate));
+}
 
-Det har syntes langt væk i et stykke tid, hvor landsholdet har været mere præget af en stagneret offensiv og en lunken begejstring end eufori og folkefest. 
+/**
+ * Combines partial + full article data into UI-ready fields. Prioritizes full article data when available.
+ *
+ * @param articleItem Article passed via navigation (have missing fields)
+ * @param fullArticle Full article fetched from API (preferred when available)
+ */
+function getArticleFields(
+  articleItem: ArticleItem | null,
+  fullArticle: DrArticle | null,
+) {
+  const title = fullArticle?.title ?? articleItem?.title ?? "Untitled article";
 
-I torsdags genfandt Joakim Mæhle og Mikkel Damsgaard glimt af det niveau, de havde for snart fem år siden. 
+  const imageUri =
+    fullArticle?.teaserImage?.default?.url ??
+    fullArticle?.teaserImage?.mobile?.url ??
+    articleItem?.imageUrl;
 
-Sammen med den dobbelte målscorer, Gustav Isaksen, i modsatte side af banen har deres samarbejde på Danmarks venstre kant gentændt en flig af dén begejstring for det danske landshold, mener DR Sportens fodboldkommentator, Andreas Kraul.
+  const hasImage = Boolean(imageUri);
 
-- Det føltes lidt som en fest i 2021. Stemningen i Parken var bedre, end den har været længe, og det var særligt Mikkel Damsgaard og Joakim Mæhle, der skabte den fest - både i torsdags og i 2021. De viste, at der stadig kan ske nogle magiske ting mellem de to.
+  const bodyText =
+    fullArticle?.text ??
+    fullArticle?.summary ??
+    articleItem?.description ??
+    null;
 
-- Når Damsgaard trækker ind i banen og bliver Danmarks playmaker, mens Mæhle bruger sine kvaliteter ude på kanten og ved at true forsvarets sidste linje med sine dybe løb, er det lidt som at se landsholdet fra for fire-fem år siden.
+  const linkUrl = fullArticle?.urlPathId
+    ? drArticleCanonicalUrl(fullArticle.urlPathId)
+    : articleItem?.link;
 
-- Netop med de to kan man se, hvor meget relationer og indbyrdes forståelse betyder i fodbold, siger Kraul.`;
+  const dateSource = fullArticle?.startDate ?? articleItem?.pubDate;
+  const formattedDate = dateSource ? formatPublishedDate(dateSource) : null;
+
+  return {
+    title,
+    hasImage,
+    imageUri,
+    bodyText,
+    linkUrl,
+    formattedDate,
+  };
+}
 
 export default function ArticleScreen() {
+  //TODO: add skeleton
   const router = useRouter();
   const { guid, item } = useLocalSearchParams<{
     guid: string;
     item?: string;
   }>();
 
-  //Jeg vil have lavet et hook og fået data fra api via guid her. const {data, loading, error} = useArticleData(guid);
-  const article: ArticleItem | null = item ? JSON.parse(item) : null;
-  const formattedDate = article?.pubDate
-    ? formatPublishedDate(article.pubDate)
-    : null;
+  // we parse the article item from the navigation params.(image url and title etc.)
+  const articleItem: ArticleItem | null = item ? JSON.parse(item) : null;
+
+  // we fetch the full article data from the API.(body text, contributions etc)
+  const { data: fullArticle, loading, error } = useArticleByUrn(guid);
+
+  // we use title and imageurl untill we have the full article data from the API. Give better user experience.
+  const { title, hasImage, imageUri, bodyText, linkUrl, formattedDate } =
+    getArticleFields(articleItem, fullArticle);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.card}>
           <View style={styles.imageWrapper}>
-            {article?.imageUrl ? (
+            {hasImage ? (
               <Image
-                source={{ uri: article.imageUrl }}
+                source={{ uri: imageUri }}
                 style={styles.image}
                 resizeMode="cover"
               />
             ) : (
               <View style={styles.imagePlaceholder}>
-                {/* <Text style={styles.imagePlaceholderText}>No image</Text> */}
+                {/**TODO: maybe remove placeholder if image is not available */}
+                <Text style={styles.imagePlaceholderText}>
+                  Billede ikke tilgængelig
+                </Text>
               </View>
             )}
             <Pressable
@@ -71,28 +123,38 @@ export default function ArticleScreen() {
               ]}
               onPress={() => router.back()}
             >
-              <Ionicons name="close" size={26} color="#FFFFFF" />
+              <Ionicons name="chevron-back" size={26} color="#FFFFFF" />
             </Pressable>
           </View>
 
           <View style={styles.content}>
-            <Text style={styles.title}>
-              {article?.title ?? "Untitled article"}
-            </Text>
+            <Text style={styles.title}>{title}</Text>
 
             {formattedDate && (
               <Text style={styles.pubDate}>{formattedDate}</Text>
             )}
 
-            <Text style={styles.breadText}>{DUMMY_TEXT}</Text>
+            {loading && !bodyText ? (
+              <View style={styles.loadingBody}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+              </View>
+            ) : null}
 
-            {article?.link ? (
+            {error ? (
+              <Text style={styles.errorText}>{error.message}</Text>
+            ) : null}
+
+            {bodyText ? (
+              <Text style={styles.breadText}>{bodyText}</Text>
+            ) : !loading && !error ? (
+              <Text style={styles.breadText}>Ingen brødtekst tilgængelig.</Text>
+            ) : null}
+
+            {linkUrl ? (
               <Pressable
                 style={styles.linkButton}
                 onPress={() => {
-                  if (article?.link) {
-                    void WebBrowser.openBrowserAsync(article?.link);
-                  }
+                  void WebBrowser.openBrowserAsync(linkUrl);
                 }}
               >
                 <Text style={styles.linkButtonText}>Læs på DR.dk</Text>
@@ -106,37 +168,29 @@ export default function ArticleScreen() {
   );
 }
 
-function formatPublishedDate(pubDate: string) {
-  return new Intl.DateTimeFormat("da-DK", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(pubDate));
-}
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F4F7FA",
+    backgroundColor: "#FAF9F6",
   },
   container: {
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    shadowRadius: 18,
-    elevation: 3,
+    //  backgroundColor: "#FAF9F6",
+    // borderRadius: 18,
+    // overflow: "hidden",
+    // borderWidth: 1,
+    // borderColor: "#E2E8F0",
+    // shadowRadius: 18,
+    // elevation: 3,
   },
   imageWrapper: {
     position: "relative",
     width: "100%",
+    borderRadius: 18,
+    overflow: "hidden",
   },
   backButton: {
     position: "absolute",
@@ -181,6 +235,15 @@ const styles = StyleSheet.create({
   pubDate: {
     fontSize: 13,
     color: "#64748B",
+  },
+  loadingBody: {
+    paddingVertical: 24,
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: "#B91C1C",
   },
   breadText: {
     fontSize: 16,
