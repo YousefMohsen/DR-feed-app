@@ -10,10 +10,12 @@ export default function ExploreScreen() {
   const [selectedFeed, setSelectedFeed] = useState<NewsFeedKey>("latest");
   // format the feeds for the filter component
   const filterItems = useMemo(() => {
-    return Object.entries(NEWS_FEEDS).map(([key, feed]) => ({
-      key,
-      label: feed.label,
-    }));
+    return Object.entries(NEWS_FEEDS)
+      .filter(([key]) => key !== "latest")
+      .map(([key, feed]) => ({
+        key,
+        label: feed.label,
+      }));
   }, []);
 
   // get the selected feed url

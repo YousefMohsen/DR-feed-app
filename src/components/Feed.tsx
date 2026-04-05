@@ -35,8 +35,10 @@ export function Feed({
   return (
     <FlatList
       keyExtractor={(item) => item.guid}
-      renderItem={({ item }) => (
+      renderItem={({ item, index }) => (
         <FeedCard
+          // just for demostrating different variations of the feed card
+          variation={index === 0 ? "featured" : "standard"}
           item={item}
           loading={loading}
           onPress={() =>

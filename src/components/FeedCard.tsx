@@ -1,6 +1,5 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
-//TODO: maybe move to ts types file
 export type FeedCardItem = {
   guid: string;
   title: string;
@@ -9,59 +8,12 @@ export type FeedCardItem = {
   imageUrl?: string;
 };
 
-type FeedCardProps = {
-  item: FeedCardItem;
-  onPress?: (item: FeedCardItem) => void;
-  loading?: boolean;
-  //TODO: add variation prop to show different styles of card.(tall image, breaking news etc. )
+export type FeedCardVariation = "standard" | "featured";
+
+const IMAGE_HEIGHT: Record<FeedCardVariation, number> = {
+  standard: 180,
+  featured: 232,
 };
-
-export function FeedCard({ item, onPress, loading }: FeedCardProps) {
-  if (loading) {
-    return <FeedCardSkeleton />;
-  }
-
-  const formatedDate = formatPublishedDate(item.pubDate);
-
-  const handlePress = () => {
-    if (onPress) {
-      onPress(item);
-      return;
-    }
-  };
-
-  return (
-    <Pressable onPress={handlePress} style={[styles.card]}>
-      {item.imageUrl && (
-        <Image
-          source={{ uri: item.imageUrl as string }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      )}
-
-      <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={3}>
-          {item.title}
-        </Text>
-        <Text style={styles.pubDate}>{formatedDate}</Text>
-      </View>
-    </Pressable>
-  );
-}
-
-function FeedCardSkeleton() {
-  return (
-    <View style={styles.card}>
-      <View style={[styles.image, styles.skeleton]} />
-
-      <View style={styles.content}>
-        <View style={[styles.skeleton, styles.skeletonTitle]} />
-        <View style={[styles.skeleton, styles.skeletonText]} />
-      </View>
-    </View>
-  );
-}
 
 function formatPublishedDate(pubDate: string) {
   return new Intl.DateTimeFormat("da-DK", {
@@ -73,6 +25,87 @@ function formatPublishedDate(pubDate: string) {
   }).format(new Date(pubDate));
 }
 
+type FeedCardProps = {
+  item: FeedCardItem;
+  onPress?: (item: FeedCardItem) => void;
+  loading?: boolean;
+  variation?: FeedCardVariation;
+};
+
+export function FeedCard({
+  item,
+  onPress,
+  loading = false,
+  variation = "standard",
+}: FeedCardProps) {
+  if (loading) {
+    return <FeedCardSkeleton variation={variation} />;
+  }
+
+  const isFeatured = variation === "featured";
+  const formattedDate = formatPublishedDate(item.pubDate);
+
+  return (
+    <Pressable
+      onPress={() => onPress?.(item)}
+      style={({ pressed }) => [
+        styles.card,
+        isFeatured && styles.cardFeatured,
+        pressed && styles.cardPressed,
+      ]}
+    >
+      {item.imageUrl && (
+        <Image
+          source={{ uri: item.imageUrl }}
+          style={[styles.image, { height: IMAGE_HEIGHT[variation] }]}
+          resizeMode="cover"
+        />
+      )}
+
+      <View style={[styles.content, isFeatured && styles.contentFeatured]}>
+        {isFeatured && <Text style={styles.featuredLabel}>Breaking</Text>}
+
+        <Text
+          style={[styles.title, isFeatured && styles.titleFeatured]}
+          numberOfLines={isFeatured ? 4 : 3}
+        >
+          {item.title}
+        </Text>
+
+        <Text style={styles.pubDate}>{formattedDate}</Text>
+      </View>
+    </Pressable>
+  );
+}
+
+function FeedCardSkeleton({
+  variation = "standard",
+}: {
+  variation?: FeedCardVariation;
+}) {
+  const isFeatured = variation === "featured";
+
+  return (
+    <View style={[styles.card, isFeatured && styles.cardFeatured]}>
+      <View
+        style={[
+          styles.image,
+          styles.skeleton,
+          { height: IMAGE_HEIGHT[variation] },
+        ]}
+      />
+
+      <View style={[styles.content, isFeatured && styles.contentFeatured]}>
+        {isFeatured && (
+          <View style={[styles.skeleton, styles.skeletonFeaturedLabel]} />
+        )}
+        <View style={[styles.skeleton, styles.skeletonTitle]} />
+        <View style={[styles.skeleton, styles.skeletonText]} />
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFFFFF",
@@ -80,31 +113,52 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    shadowRadius: 18,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
     elevation: 3,
+  },
+  cardFeatured: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#F8DA49",
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 20,
+    elevation: 8,
   },
   cardPressed: {
     opacity: 0.92,
   },
   image: {
     width: "100%",
-    height: 180,
     backgroundColor: "#E2E8F0",
   },
-  imagePlaceholder: {
+  imageFallback: {
     width: "100%",
-    height: 120,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#EFF3F6",
-  },
-  imagePlaceholderText: {
-    color: "#64748B",
-    fontSize: 14,
+    backgroundColor: "#E2E8F0",
   },
   content: {
     padding: 16,
     gap: 10,
+  },
+  contentFeatured: {
+    backgroundColor: "#FFFBEB",
+    paddingVertical: 18,
+    gap: 8,
+  },
+  featuredLabel: {
+    alignSelf: "flex-start",
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#0F172A",
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+    backgroundColor: "#F8DA49",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    overflow: "hidden",
   },
   title: {
     fontSize: 18,
@@ -112,24 +166,34 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#0F172A",
   },
+  titleFeatured: {
+    fontSize: 20,
+    lineHeight: 27,
+    fontWeight: "800",
+  },
   pubDate: {
     fontSize: 13,
     color: "#64748B",
   },
-
-  // skeleton styles
   skeleton: {
     backgroundColor: "#E2E8F0",
   },
+  skeletonFeaturedLabel: {
+    height: 22,
+    width: 88,
+    borderRadius: 6,
+    marginBottom: 2,
+    backgroundColor: "rgba(248, 218, 73, 0.45)",
+  },
   skeletonTitle: {
     height: 20,
-    borderRadius: 6,
     width: "90%",
+    borderRadius: 6,
   },
   skeletonText: {
     height: 14,
-    borderRadius: 6,
     width: "50%",
+    borderRadius: 6,
   },
 });
 
