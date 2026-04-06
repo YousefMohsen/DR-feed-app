@@ -2,7 +2,7 @@
 
 Projektet er bygget med React Native og Expo 55 i managed flow.
 
-Jeg bruger expo-router med filbaseret navigation.
+Appen bruger expo-router med filbaseret navigation.
 
 ## Indhold
 
