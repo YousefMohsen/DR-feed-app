@@ -4,6 +4,17 @@ Projektet er bygget med React Native og Expo 55 i managed flow.
 
 Jeg bruger expo-router med filbaseret navigation.
 
+## Indhold
+
+- [Kernefunktionalitet](#kernefunktionalitet)
+  - [Derudover er der implementeret](#derudover-er-der-implementeret)
+- [Sådan startes appen](#sådan-startes-appen)
+- [API'er](#apier)
+  - [Artikelsiden bruger GraphQL](#artikelsiden-bruger-graphql)
+  - [LLM](#llm)
+- [Overvejelser / tradeoffs](#overvejelser-tradeoffs)
+- [Demo](#demo)
+
 ## Kernefunktionalitet
 
 - Henter og viser en liste af nyheder med titel og billede
@@ -85,3 +96,29 @@ Jeg ville ikke bruge den i en produktionsapp.
 
 **Platform**  
 Jeg har primært udviklet og optimeret til iOS.
+
+## Demo
+
+Skærmbilleder og en kort demo-video af appen (filerne ligger i mappen [`demo/`](demo/)).
+
+### Hjem / feed
+
+![Hjemskærm med nyhedsfeed](demo/home.png)
+
+### Udforsk
+
+![Udforsk](demo/explore.png)
+
+### Artikel
+
+![Artikelside](demo/article.png)
+
+### Opsummering
+
+![Artikel med opsummering](demo/articleSummary.png)
+
+<video src="demo/demo.mp4" controls playsinline width="100%">
+  <a href="demo/demo.mp4">Åbn demo-videoen (MP4)</a>
+</video>
+
+Hvis videoen ikke vises i din visning, kan du åbne filen direkte: [demo/demo.mp4](demo/demo.mp4).
