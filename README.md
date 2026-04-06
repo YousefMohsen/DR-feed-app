@@ -121,4 +121,4 @@ Skærmbilleder og en kort demo-video af appen (filerne ligger i mappen [`demo/`]
   <a href="demo/demo.mp4">Åbn demo-videoen (MP4)</a>
 </video>
 
-Hvis videoen ikke vises i din visning, kan du åbne filen direkte: [demo/demo.mp4](demo/demo.mp4).
+Video: [demo/demo.mp4](demo/demo.mp4).
