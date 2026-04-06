@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 /**
- * DR Steffi GraphQL (same endpoint as dr.dk article pages).
+ * DR GraphQL (same endpoint as dr.dk article pages).
  * Set `EXPO_PUBLIC_DR_STEFFI_GRAPHQL_URL` in `.env` (see `.env.example`).
  */
 export const DR_STEFFI_GRAPHQL_URL =

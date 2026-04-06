@@ -16,21 +16,22 @@ type FeedProps = {
   "data" | "renderItem" | "keyExtractor" | "refreshing" | "onRefresh"
 >;
 
+/**
+ * A feed component that displays a list of DR articles.
+ * @param loading - Whether the feed is loading.
+ * @param data - The feed data.
+ * @param refetch - A function to refetch the feed.
+ * @param error - An error object if the feed fails to load.
+ * @param flatListProps - Additional props to pass to the FlatList component.
+ */
 export function Feed({
   loading,
   data,
-  refetch: _refetch,
+  refetch,
   error,
   ...flatListProps
 }: FeedProps) {
   const router = useRouter();
-  // if (error) {
-  //   return <Text style={styles.info}>noget gik galt.</Text>;
-  // }
-
-  // if (!data) {
-  //   return null;
-  // }
 
   return (
     <FlatList
@@ -55,7 +56,7 @@ export function Feed({
       ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       data={data?.items}
       refreshing={loading}
-      onRefresh={_refetch}
+      onRefresh={refetch}
       {...flatListProps}
     />
   );

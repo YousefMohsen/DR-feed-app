@@ -1,3 +1,4 @@
+import { formatPublishedDate } from "@/src/utils/utils";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export type FeedCardItem = {
@@ -10,20 +11,13 @@ export type FeedCardItem = {
 
 export type FeedCardVariation = "standard" | "featured";
 
+/**
+ * The height of the image in the feed card. Two variations available.
+ */
 const IMAGE_HEIGHT: Record<FeedCardVariation, number> = {
   standard: 180,
   featured: 232,
 };
-
-function formatPublishedDate(pubDate: string) {
-  return new Intl.DateTimeFormat("da-DK", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(pubDate));
-}
 
 type FeedCardProps = {
   item: FeedCardItem;

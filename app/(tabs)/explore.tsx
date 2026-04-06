@@ -8,6 +8,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ExploreScreen() {
   // state for the selected feed
   const [selectedFeed, setSelectedFeed] = useState<NewsFeedKey>("indland");
+  // get the selected feed url
+  const selectedUrl = NEWS_FEEDS[selectedFeed].url;
+  // fetch the feed data
+  const { data, loading, error, refetch } = useFetchFeed(selectedUrl);
+
   // format the feeds for the filter component
   const filterItems = useMemo(() => {
     return Object.entries(NEWS_FEEDS)
@@ -17,11 +22,6 @@ export default function ExploreScreen() {
         label: feed.label,
       }));
   }, []);
-
-  // get the selected feed url
-  const selectedUrl = NEWS_FEEDS[selectedFeed].url;
-  // fetch the feed data
-  const { data, loading, error, refetch } = useFetchFeed(selectedUrl);
 
   return (
     <SafeAreaView style={styles.container}>

@@ -5,6 +5,7 @@ import {
 } from "@/src/hooks/useArticleByUrn";
 import { useSpeech } from "@/src/hooks/useSpeech";
 import { useSummarize } from "@/src/hooks/useSummarize";
+import { formatPublishedDate } from "@/src/utils/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
@@ -20,6 +21,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+//Maybe move to ts types file
 type ArticleItem = {
   guid: string;
   title: string;
@@ -29,23 +31,14 @@ type ArticleItem = {
   imageUrl?: string;
 };
 
-function formatPublishedDate(pubDate: string) {
-  return new Intl.DateTimeFormat("da-DK", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(pubDate));
-}
-
 export default function ArticleScreen() {
   const router = useRouter();
+  //get article id and feedcard item from the router params
   const { guid, item } = useLocalSearchParams<{
     guid: string;
     item?: string;
   }>();
-  //article item from the RSS feed. passed through the router.
+  //parse rrs-item.
   const articleItem: ArticleItem | null = item ? JSON.parse(item) : null;
   // will fetch the article from the graphql API
   const { data: fullArticle, loading, error } = useArticleByUrn(guid);
@@ -56,7 +49,7 @@ export default function ArticleScreen() {
     fullArticle?.text ?? null,
   );
 
-  const title = fullArticle?.title ?? articleItem?.title ?? "Untitled article";
+  const title = fullArticle?.title ?? articleItem?.title ?? "-";
   // will get the image from the article and fallback to the RSS feed image
   const imageUri =
     fullArticle?.teaserImage?.default?.url ??
