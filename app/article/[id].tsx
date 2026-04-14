@@ -39,9 +39,10 @@ export default function ArticleScreen() {
     item?: string;
   }>();
   //parse rrs-item.
-  const articleItem: ArticleItem | null = item ? JSON.parse(item) : null;
+  // const articleItem: ArticleItem | null = item ? JSON.parse(item) : null;
   // will fetch the article from the graphql API
   const { data: fullArticle, loading, error } = useArticleByUrn(guid);
+
   // will use the system's text-to-speech to read the article text
   const { stop, toggleSpeak, isReading } = useSpeech();
   // will create an AI summary of the article text
@@ -49,18 +50,17 @@ export default function ArticleScreen() {
     fullArticle?.text ?? null,
   );
 
-  const title = fullArticle?.title ?? articleItem?.title ?? "-";
+  const title = fullArticle?.title ?? "-";
   // will get the image from the article and fallback to the RSS feed image
   const imageUri =
     fullArticle?.teaserImage?.default?.url ??
-    fullArticle?.teaserImage?.mobile?.url ??
-    articleItem?.imageUrl;
+    fullArticle?.teaserImage?.mobile?.url;
 
   const linkUrl = fullArticle?.urlPathId
     ? drArticleCanonicalUrl(fullArticle.urlPathId)
-    : articleItem?.link;
+    : null;
 
-  const dateSource = fullArticle?.startDate ?? articleItem?.pubDate;
+  const dateSource = fullArticle?.startDate;
   const formattedDate = dateSource ? formatPublishedDate(dateSource) : null;
 
   // Stop speech when navigating away

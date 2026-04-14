@@ -1,0 +1,42 @@
+query Article($urn: String!) {
+  article(urn: $urn) {
+    title
+    summary
+    text
+    startDate
+    wordCount
+    breaking
+    urlPathId
+    teaserImage {
+      default {
+        url
+      }
+      mobile {
+        url
+      }
+    }
+    contributions {
+      role
+      bylinePrefix
+      prefix
+      title
+      titleSuffix
+      agent {
+        __typename
+      }
+    }
+    body {
+      __typename
+      ... on ParagraphComponent {
+        body
+      }
+      ... on HeadingComponent {
+        text
+      }
+      ... on QuoteComponent {
+        body
+        citation
+      }
+    }
+  }
+}
