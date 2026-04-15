@@ -38,7 +38,7 @@ export default function ArticleScreen() {
     guid: string;
     item?: string;
   }>();
-  //parse rrs-item.
+  //parse rrs-item. TOOD: re-evalute if necessary
   const articleItem: ArticleItem | null = item ? JSON.parse(item) : null;
   // will fetch the article from the graphql API
   const { data: fullArticle, loading, error } = useArticleByUrn(guid);

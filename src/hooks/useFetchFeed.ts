@@ -25,6 +25,10 @@ type UseFetchFeedResult = {
   refetch: () => Promise<void>;
 };
 
+/**
+ * Fetches an RSS feed and returns the data.
+ * @param url - The URL of the RSS feed to fetch.
+ */
 export function useFetchFeed(url: string): UseFetchFeedResult {
   const [data, setData] = useState<FeedData | null>(null);
   const [loading, setLoading] = useState(false);

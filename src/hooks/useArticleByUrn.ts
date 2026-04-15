@@ -92,6 +92,11 @@ export function normalizeDrArticleUrn(
   return trimmed;
 }
 
+/**
+ * Converts a URL path ID to a canonical URL.
+ * @param urlPathId - The URL path ID to convert.
+ * @returns The canonical URL.
+ */
 export function drArticleCanonicalUrl(urlPathId: string): string {
   if (!urlPathId) return "https://www.dr.dk";
   return urlPathId.startsWith("http")
